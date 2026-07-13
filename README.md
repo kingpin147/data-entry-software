@@ -1,73 +1,137 @@
 # Wix Data Entry & Retrieval Software
 
-This repository contains client-side JavaScript code built using **Velo by Wix** to manage and retrieve custom records in a Wix database collection named `PeopleData`.
+This repository contains client-side JavaScript code built using **Velo by Wix** to manage and retrieve records in a Wix database collection named `ClientData`.
 
 ---
 
 ## 📂 Project Structure
 
-- **[codePage.js](file:///d:/nouman%20wix%20code/data%20entry%20software/codePage.js)**: Logic for the record retrieval page (querying records via code).
-- **[dataentryPage.js](file:///d:/nouman%20wix%20code/data%20entry%20software/dataentryPage.js)**: Logic for the data entry panel (adding, searching, filtering, and deleting records).
+- **`codePage.js`** — Logic for the record retrieval page. Visitors enter a **Ref number** to look up all matching records, displayed in a table.
+- **`dataentryPage.js`** — Logic for the admin data entry panel (adding, searching, filtering, and deleting records).
 
 ---
 
 ## 🗄️ Database Schema
 
-The system interacts with a Wix database collection named **`PeopleData`**. Below are the expected field keys and types in the collection:
+The system interacts with a Wix database collection named **`ClientData`**.
 
-| Field Name | Field Key | Type | Description |
-| :--- | :--- | :--- | :--- |
-| **Name** | `name` | Text (`string`) | Person's full name |
-| **Age** | `age` | Number (`number`) | Person's age |
-| **Gender** | `gender` | Text (`string`) | Person's gender |
-| **City** | `city` | Text (`string`) | Person's city of residence |
-| **Code** | `code` | Text (`string`) | A unique lookup identifier |
+| Column Label        | Field Key          | Type     | Notes                                      |
+| :------------------ | :----------------- | :------- | :----------------------------------------- |
+| **Ref**             | `ref`              | Text     | Unique lookup identifier                   |
+| **Client**          | `client`           | Text     | Client name                                |
+| **Address**         | `address`          | Text     | Client address                             |
+| **Type of Report**  | `typeOfReport`     | Text     | Category/type of the report                |
+| **Reporting Period**| `reportingPeriod`  | Text     | Period covered by the report               |
+| **Date of Issue**   | `dateOfIssue`      | **Date** | Stored as a Wix Date object; displayed as `YYYY-MM-DD` |
+| **Page 5 Footing**  | `page5Footing`     | Text     | Footing content for page 5                 |
+
+> ⚠️ Field keys are **case-sensitive**. Ensure they match exactly in the Wix collection.
+> ⚠️ `dateOfIssue` must be a **Date** field (not Text) in the Wix collection.
 
 ---
 
 ## 🚀 Page Implementations
 
 ### 1. Code Lookup Page (`codePage.js`)
-This page allows visitors to enter a unique lookup code to pull their specific details.
 
-* **UI Components Needed:**
-  * `#codeInput`: Input field where the user types their code.
-  * `#startButton`: Button that triggers the search.
-  * `#data`: Container box holding the text display fields (hidden by default).
-  * `#name`, `#age`, `#gender`, `#city`: Text elements displaying matching record details.
-  * `#statusText`: Text element displaying loading messages or error/not-found notices.
-* **Key Functionality:**
-  * Performs a query using `wixData.query("PeopleData").eq("code", code).find()`.
-  * Controls visibility states of UI containers dynamically based on data availability.
+Allows visitors to enter a **Ref number** and view **all matching records** in a table.
+
+- **UI Components Required:**
+
+  | Element ID       | Type         | Purpose                                           |
+  | :--------------- | :----------- | :------------------------------------------------ |
+  | `#codeInput`     | Input field  | User types their Ref number here                  |
+  | `#startButton`   | Button       | Triggers the search                               |
+  | `#data`          | Container    | Wraps `#resultsTable` (hidden by default)         |
+  | `#resultsTable`  | Table        | Displays all records matching the entered Ref     |
+  | `#statusText`    | Text element | Shows loading state, errors, or "not found" msg  |
+
+- **Key Functionality:**
+  - Queries `ClientData` using `.eq("ref", code)` — returns **all rows** sharing the same Ref.
+  - Populates `#resultsTable` via `dataFetcher` (supports virtual paging).
+  - Dynamically shows/hides `#data` container based on results.
+
+- **Table Columns in `#resultsTable`:**
+
+  | Label             | dataPath          |
+  | :---------------- | :---------------- |
+  | Client            | `client`          |
+  | Address           | `address`         |
+  | Type of Report    | `typeOfReport`    |
+  | Reporting Period  | `reportingPeriod` |
+  | Date of Issue     | `dateOfIssue`     |
+  | Page 5 Footing    | `page5Footing`    |
+
+---
 
 ### 2. Admin & Data Entry Page (`dataentryPage.js`)
-An administrative control panel to manage data entries, complete with real-time filtering.
 
-* **UI Components Needed:**
-  * **Table:** `#table1` (custom data fetcher implemented for virtual paging).
-  * **Insert Form:** `#nameInput`, `#ageInput`, `#genderInput`, `#cityInput`, `#codeInput`, `#submitButton`, and `#submitStatus` (text).
-  * **Search & Filter:** `#searchInput`, `#searchStatus` (text).
-  * **Deletion:** `#deleteInput` (text input which triggers real-time table filtering), `#deleteButton`, and `#deleteStatus` (text).
-  * **Reset:** `#resetButton` (clears all status messages, searches, and resets the table view).
-* **Key Functionality:**
-  * **Create:** Validates and inserts new records using `wixData.insert`.
-  * **Retrieve:** Populates the custom table and implements pagination/slicing via `dataFetcher`.
-  * **Search/Filter:** Performs instant local filtering on `allData` arrays to respond to keypress inputs immediately.
-  * **Delete:** Searches for records by matching Name OR Code and deletes all matching results using `wixData.remove`.
+An administrative control panel to manage all records, with real-time filtering and delete by Ref or Client name.
+
+- **UI Components Required:**
+
+  | Element ID              | Type          | Purpose                                                         |
+  | :---------------------- | :------------ | :-------------------------------------------------------------- |
+  | `#table1`               | Table         | Displays all records with virtual paging                        |
+  | `#refInput`             | Input         | Ref number (unique identifier)                                  |
+  | `#clientInput`          | Input         | Client name                                                     |
+  | `#addressInput`         | Input         | Address                                                         |
+  | `#typeOfReportInput`    | Input         | Type of report                                                  |
+  | `#reportingPeriodInput` | Input         | Reporting period                                                |
+  | `#dateOfIssueInput`     | Date Picker   | Date of issue — must be a **Date Picker** element               |
+  | `#page5FootingInput`    | Input         | Page 5 footing                                                  |
+  | `#submitButton`         | Button        | Submits new entry                                               |
+  | `#submitStatus`         | Text element  | Shows success/error after submit                                |
+  | `#searchInput`          | Input         | Live search across all fields (clearing restores full table)    |
+  | `#searchStatus`         | Text element  | Shows result count during search                                |
+  | `#deleteInput`          | Input         | Enter Ref **or** Client name to delete (also filters table live)|
+  | `#deleteButton`         | Button        | Deletes all records matching Ref or Client name                 |
+  | `#deleteStatus`         | Text element  | Lists every deleted record (Ref + Client name)                  |
+
+- **Key Functionality:**
+  - **Create:** Validates all 7 fields, then inserts using `wixData.insert`. Date picker value is stored as a native Date object.
+  - **Retrieve:** Loads up to 1,000 records; table uses `dataFetcher` for virtual paging. `dateOfIssue` is normalised to `YYYY-MM-DD` on load.
+  - **Search:** Instant local filtering across all 7 fields on every keystroke. Clearing the search input automatically restores the full table — no reset button needed.
+  - **Delete:** Searches by **Ref** (exact match) **and** by **Client name** (contains), merges unique results, and deletes all matches. The status message lists every deleted record's Ref and Client name, e.g.:
+    ```
+    2 entry(s) deleted:
+    • Ref: A101  |  Client: John Smith
+    • Ref: A102  |  Client: John Smith Ltd
+    ```
 
 ---
 
 ## 🛠️ Setup Instructions in Wix
 
 1. **Enable Velo:**
-   In the Wix Editor, click **Dev Mode** in the top menu and select **Turn on Dev Mode**.
-2. **Create the Database:**
-   * Go to the **Databases** tab on the left sidebar.
-   * Add a new collection named **`PeopleData`**.
-   * Add the columns corresponding to the schema above (`name`, `age`, `gender`, `city`, `code`). Make sure the field keys match the casing exactly.
-3. **Set Up Page Elements:**
-   * Create two pages (e.g., "Lookup" and "Admin Portal").
-   * Build the UI forms, table, buttons, and text fields matching the IDs defined in the code (e.g., `#submitButton`, `#table1`, etc.).
-4. **Copy & Paste Code:**
-   * Copy the code from `codePage.js` into the page code editor for your lookup page.
-   * Copy the code from `dataentryPage.js` into the page code editor for your admin page.
+   In the Wix Editor, click **Dev Mode** → **Turn on Dev Mode**.
+
+2. **Create the Database Collection:**
+   - Go to the **Databases** tab on the left sidebar.
+   - Add a new collection named **`ClientData`**.
+   - Add the 7 fields from the schema above, with types matching exactly:
+     - `ref`, `client`, `address`, `typeOfReport`, `reportingPeriod`, `page5Footing` → **Text**
+     - `dateOfIssue` → **Date** (calendar icon, not Text)
+   - Ensure field keys match **exactly** (case-sensitive).
+
+3. **Set Up Pages & Elements:**
+   - Create two pages: e.g. **"Lookup"** and **"Admin Portal"**.
+   - On the **Lookup** page: add `#codeInput`, `#startButton`, `#statusText`, a container `#data`, and inside it a Table element `#resultsTable`.
+   - On the **Admin** page: add all input fields listed above. Use a **Date Picker** element for `#dateOfIssueInput`.
+
+4. **Paste the Code:**
+   - Copy `codePage.js` into the page code editor for the **Lookup** page.
+   - Copy `dataentryPage.js` into the page code editor for the **Admin** page.
+
+---
+
+## 📝 Changelog
+
+| Change                                     | Details                                                                 |
+| :----------------------------------------- | :---------------------------------------------------------------------- |
+| Collection renamed                         | `PeopleData` → `ClientData`                                             |
+| `dateOfIssue` type corrected               | Changed from Text to **Date**; handled as `Date` object in all operations |
+| Date display normalised                    | Date objects formatted to `YYYY-MM-DD` string when loading table        |
+| Delete expanded                            | Now searches by **Ref (exact)** or **Client name (contains)**           |
+| Delete status improved                     | Lists each deleted record's Ref and Client name                         |
+| Reset button removed                       | Clearing the search input already restores the full table               |

@@ -1,5 +1,7 @@
 import wixData from 'wix-data';
 
+let resultData = []; // Records found for the searched Ref
+
 $w.onReady(function () {
     console.log(">>> codePage onReady started");
 
@@ -7,16 +9,37 @@ $w.onReady(function () {
     $w('#data').hide();
     try { $w('#statusText').hide(); } catch (e) {}
 
-    // "Start Now" button
+    // Set up table columns
+    $w('#resultsTable').columns = [
+        { "id": "client",          "dataPath": "client",          "label": "Client",           "type": "string", "width": 160, "visible": true },
+        { "id": "address",         "dataPath": "address",         "label": "Address",          "type": "string", "width": 180, "visible": true },
+        { "id": "typeOfReport",    "dataPath": "typeOfReport",    "label": "Type of Report",   "type": "string", "width": 140, "visible": true },
+        { "id": "reportingPeriod", "dataPath": "reportingPeriod", "label": "Reporting Period", "type": "string", "width": 140, "visible": true },
+        { "id": "dateOfIssue",     "dataPath": "dateOfIssue",     "label": "Date of Issue",    "type": "string", "width": 120, "visible": true },
+        { "id": "page5Footing",    "dataPath": "page5Footing",    "label": "Page 5 Footing",   "type": "string", "width": 140, "visible": true }
+    ];
+
+    // dataFetcher — table calls this whenever it needs rows
+    $w('#resultsTable').dataFetcher = (startRow, endRow) => {
+        return new Promise((resolve) => {
+            const pageRows = resultData.slice(startRow, endRow);
+            resolve({
+                pageRows: pageRows,
+                totalRowsCount: resultData.length
+            });
+        });
+    };
+
+    // "Start Now" button — searches by Ref (unique identifier)
     $w('#startButton').onClick(async () => {
         console.log(">>> Start button clicked");
         const code = $w('#codeInput').value.trim();
-        console.log(">>> Code entered:", code);
+        console.log(">>> Ref entered:", code);
 
         if (!code) {
             $w('#data').hide();
             try {
-                $w('#statusText').text = "Please enter a code.";
+                $w('#statusText').text = "Please enter a Ref number.";
                 $w('#statusText').show();
             } catch (e) {}
             return;
@@ -30,30 +53,27 @@ $w.onReady(function () {
         } catch (e) {}
 
         try {
-            const results = await wixData.query("PeopleData")
-                .eq("code", code)
+            const results = await wixData.query("ClientData")
+                .eq("ref", code)
                 .find();
 
             console.log(">>> Items found:", results.items.length);
 
             if (results.items.length > 0) {
-                const item = results.items[0]; // Single entry per code
+                // Load ALL matching rows into table
+                resultData = results.items;
+                $w('#resultsTable').refresh();
 
-                // Populate text elements
-                $w('#name').text = item.name || "";
-                $w('#age').text = String(item.age || "");
-                $w('#gender').text = item.gender || "";
-                $w('#city').text = item.city || "";
-
-                console.log(">>> Data populated:", item.name, item.age, item.gender, item.city);
+                console.log(">>> Table populated with", resultData.length, "row(s)");
 
                 // Show the data container, hide status
                 $w('#data').show();
                 try { $w('#statusText').hide(); } catch (e) {}
             } else {
                 $w('#data').hide();
+                resultData = [];
                 try {
-                    $w('#statusText').text = "Invalid code. No records found.";
+                    $w('#statusText').text = "Invalid Ref. No records found.";
                     $w('#statusText').show();
                 } catch (e) {}
             }

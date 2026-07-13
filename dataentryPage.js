@@ -54,32 +54,45 @@ $w.onReady(function () {
             return;
         }
 
-        const toInsert = {
-            "ref":             ref,
-            "client":          client,
-            "address":         address,
-            "typeOfReport":    typeOfReport,
-            "reportingPeriod": reportingPeriod,
-            "dateOfIssue":     dateOfIssue,
-            "page5Footing":    page5Footing
-        };
+        // Check if Ref number already exists
+        wixData.query("ClientData")
+            .eq("ref", ref)
+            .limit(1)
+            .find()
+            .then((results) => {
+                if (results.items.length > 0) {
+                    $w('#submitStatus').text = "Reference number already exists in database.";
+                    $w('#submitStatus').show();
+                    return;
+                }
 
-        wixData.insert("ClientData", toInsert)
-            .then(() => {
-                // Clear all input fields after successful insert
-                $w('#refInput').value             = "";
-                $w('#clientInput').value          = "";
-                $w('#addressInput').value         = "";
-                $w('#typeOfReportInput').value    = "";
-                $w('#reportingPeriodInput').value = "";
-                $w('#dateOfIssueInput').value     = null;  // Date picker cleared with null
-                $w('#page5FootingInput').value    = "";
+                const toInsert = {
+                    "ref":             ref,
+                    "client":          client,
+                    "address":         address,
+                    "typeOfReport":    typeOfReport,
+                    "reportingPeriod": reportingPeriod,
+                    "dateOfIssue":     dateOfIssue,
+                    "page5Footing":    page5Footing
+                };
 
-                $w('#submitStatus').text = "Entry added successfully!";
-                $w('#submitStatus').show();
+                return wixData.insert("ClientData", toInsert)
+                    .then(() => {
+                        // Clear all input fields after successful insert
+                        $w('#refInput').value             = "";
+                        $w('#clientInput').value          = "";
+                        $w('#addressInput').value         = "";
+                        $w('#typeOfReportInput').value    = "";
+                        $w('#reportingPeriodInput').value = "";
+                        $w('#dateOfIssueInput').value     = null;  // Date picker cleared with null
+                        $w('#page5FootingInput').value    = "";
 
-                // Reload table to show new entry
-                loadTableData();
+                        $w('#submitStatus').text = "Entry added successfully!";
+                        $w('#submitStatus').show();
+
+                        // Reload table to show new entry
+                        loadTableData();
+                    });
             })
             .catch((err) => {
                 console.error("Error inserting data:", err);

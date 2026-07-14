@@ -135,3 +135,5 @@ An administrative control panel to manage all records, with real-time filtering 
 | Delete expanded                            | Now searches by **Ref (exact)** or **Client name (contains)**           |
 | Delete status improved                     | Lists each deleted record's Ref and Client name                         |
 | Reset button removed                       | Clearing the search input already restores the full table               |
+| Optimized Table Column Widths              | Standardized column widths to fit viewport without horizontal overflow  |
+| Detailed Lookup Notice                     | Replaced generic lookup error message with a detailed multi-line notice |

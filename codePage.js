@@ -11,12 +11,12 @@ $w.onReady(function () {
 
     // Set up table columns
     $w('#resultsTable').columns = [
-        { "id": "client",          "dataPath": "client",          "label": "Client",           "type": "string", "width": 160, "visible": true },
-        { "id": "address",         "dataPath": "address",         "label": "Address",          "type": "string", "width": 180, "visible": true },
-        { "id": "typeOfReport",    "dataPath": "typeOfReport",    "label": "Type of Report",   "type": "string", "width": 140, "visible": true },
-        { "id": "reportingPeriod", "dataPath": "reportingPeriod", "label": "Reporting Period", "type": "string", "width": 140, "visible": true },
-        { "id": "dateOfIssue",     "dataPath": "dateOfIssue",     "label": "Date of Issue",    "type": "string", "width": 120, "visible": true },
-        { "id": "page5Footing",    "dataPath": "page5Footing",    "label": "Page 5 Footing",   "type": "string", "width": 140, "visible": true }
+        { "id": "client",          "dataPath": "client",          "label": "Client",           "type": "string", "width": 140, "visible": true },
+        { "id": "address",         "dataPath": "address",         "label": "Address",          "type": "string", "width": 300, "visible": true },
+        { "id": "typeOfReport",    "dataPath": "typeOfReport",    "label": "Type of Report",   "type": "string", "width": 130, "visible": true },
+        { "id": "reportingPeriod", "dataPath": "reportingPeriod", "label": "Reporting Period", "type": "string", "width": 130, "visible": true },
+        { "id": "dateOfIssue",     "dataPath": "dateOfIssue",     "label": "Date of Issue",    "type": "string", "width": 110, "visible": true },
+        { "id": "page5Footing",    "dataPath": "page5Footing",    "label": "Page 5 Footing",   "type": "string", "width": 130, "visible": true }
     ];
 
     // dataFetcher — table calls this whenever it needs rows
@@ -73,7 +73,11 @@ $w.onReady(function () {
                 $w('#data').hide();
                 resultData = [];
                 try {
-                    $w('#statusText').text = "Invalid Ref. No records found.";
+                    $w('#statusText').text = `Can't find your report?
+
+Please note that newly issued reports may take up to 3 working days from the date of issuance to appear in our verification system.
+
+If your report is still not available after 3 working days, please contact us at info@bsaccountants.ae so we can review and update our records, if required.`;
                     $w('#statusText').show();
                 } catch (e) {}
             }

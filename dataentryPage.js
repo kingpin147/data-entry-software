@@ -7,13 +7,13 @@ $w.onReady(function () {
 
     // Set up table columns
     $w('#table1').columns = [
-        { "id": "ref",             "dataPath": "ref",             "label": "Ref",               "type": "string", "width": 80,  "visible": true },
-        { "id": "client",          "dataPath": "client",          "label": "Client",             "type": "string", "width": 160, "visible": true },
-        { "id": "address",         "dataPath": "address",         "label": "Address",            "type": "string", "width": 180, "visible": true },
-        { "id": "typeOfReport",    "dataPath": "typeOfReport",    "label": "Type of Report",     "type": "string", "width": 140, "visible": true },
-        { "id": "reportingPeriod", "dataPath": "reportingPeriod", "label": "Reporting Period",   "type": "string", "width": 140, "visible": true },
-        { "id": "dateOfIssue",     "dataPath": "dateOfIssue",     "label": "Date of Issue",      "type": "string", "width": 120, "visible": true },
-        { "id": "page5Footing",    "dataPath": "page5Footing",    "label": "Page 5 Footing",     "type": "string", "width": 140, "visible": true }
+        { "id": "ref",             "dataPath": "ref",             "label": "Ref",               "type": "string", "width": 60,  "visible": true },
+        { "id": "client",          "dataPath": "client",          "label": "Client",             "type": "string", "width": 130, "visible": true },
+        { "id": "address",         "dataPath": "address",         "label": "Address",            "type": "string", "width": 260, "visible": true },
+        { "id": "typeOfReport",    "dataPath": "typeOfReport",    "label": "Type of Report",     "type": "string", "width": 130, "visible": true },
+        { "id": "reportingPeriod", "dataPath": "reportingPeriod", "label": "Reporting Period",   "type": "string", "width": 130, "visible": true },
+        { "id": "dateOfIssue",     "dataPath": "dateOfIssue",     "label": "Date of Issue",      "type": "string", "width": 110, "visible": true },
+        { "id": "page5Footing",    "dataPath": "page5Footing",    "label": "Page 5 Footing",     "type": "string", "width": 130, "visible": true }
     ];
 
     // Set dataFetcher — the table calls this whenever it needs rows

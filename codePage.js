@@ -60,8 +60,19 @@ $w.onReady(function () {
             console.log(">>> Items found:", results.items.length);
 
             if (results.items.length > 0) {
-                // Load ALL matching rows into table
-                resultData = results.items;
+                // Load ALL matching rows into table and normalise dateOfIssue: convert Date objects → "YYYY-MM-DD" string
+                resultData = results.items.map(item => {
+                    if (item.dateOfIssue) {
+                        const d = new Date(item.dateOfIssue);
+                        if (!isNaN(d.getTime())) {
+                            const yyyy = d.getFullYear();
+                            const mm   = String(d.getMonth() + 1).padStart(2, '0');
+                            const dd   = String(d.getDate()).padStart(2, '0');
+                            item.dateOfIssue = yyyy + "-" + mm + "-" + dd;
+                        }
+                    }
+                    return item;
+                });
                 $w('#resultsTable').refresh();
 
                 console.log(">>> Table populated with", resultData.length, "row(s)");

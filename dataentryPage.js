@@ -199,7 +199,7 @@ $w.onReady(function () {
                 (item.address         && item.address.toLowerCase().includes(searchTerm)) ||
                 (item.typeOfReport    && item.typeOfReport.toLowerCase().includes(searchTerm)) ||
                 (item.reportingPeriod && item.reportingPeriod.toLowerCase().includes(searchTerm)) ||
-                (item.dateOfIssue     && item.dateOfIssue instanceof Date && item.dateOfIssue.toLocaleDateString().toLowerCase().includes(searchTerm)) ||
+                (item.dateOfIssue     && (typeof item.dateOfIssue === 'string' ? item.dateOfIssue.toLowerCase().includes(searchTerm) : (item.dateOfIssue instanceof Date && item.dateOfIssue.toLocaleDateString().toLowerCase().includes(searchTerm)))) ||
                 (item.page5Footing    && item.page5Footing.toLowerCase().includes(searchTerm))
             );
         });
@@ -222,12 +222,14 @@ function loadTableData() {
         .then((results) => {
             // Normalise dateOfIssue: convert Date objects → "YYYY-MM-DD" string
             allData = results.items.map(item => {
-                if (item.dateOfIssue instanceof Date) {
-                    const d = item.dateOfIssue;
-                    const yyyy = d.getFullYear();
-                    const mm   = String(d.getMonth() + 1).padStart(2, '0');
-                    const dd   = String(d.getDate()).padStart(2, '0');
-                    item.dateOfIssue = yyyy + "-" + mm + "-" + dd;
+                if (item.dateOfIssue) {
+                    const d = new Date(item.dateOfIssue);
+                    if (!isNaN(d.getTime())) {
+                        const yyyy = d.getFullYear();
+                        const mm   = String(d.getMonth() + 1).padStart(2, '0');
+                        const dd   = String(d.getDate()).padStart(2, '0');
+                        item.dateOfIssue = yyyy + "-" + mm + "-" + dd;
+                    }
                 }
                 return item;
             });
